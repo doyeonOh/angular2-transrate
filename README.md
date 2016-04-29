@@ -32,7 +32,7 @@ Angular 는 브라우저에서 우리의 application content 를 보여주거나
 
 저 8개를 배우고 우리만의 방식으로 해보자.(??)
 
-``` The code referenced in this chapter is available as a live example.  ```
+>The code referenced in this chapter is available as a live example.
 
 
 모듈
@@ -44,31 +44,30 @@ Angular 는 브라우저에서 우리의 application content 를 보여주거나
 
 
 ![enter image description here](https://angular.io/resources/images/devguide/architecture/module.png)
-```
-모듈은 option 이다.
+
+>모듈은 option 이다.
 우리는 모듈 방식의 설계를 매우 추천한다. TypeScript 는 ES2015 모듈 문법을 많이 서포트하고 있고 챕터들은 그 문법들을 사용하게 함으로서 우리가 좀 더 모듈 방식에 가까워지도록 하게한다. 그것이 우리가 basic building blocks  사이에 모듈을 넣은 이유이다.
 
-Angular 는 스스로 모듈방식 접근이나 상세한 문법을 필요로 하지는 않는다. 만약 당신이 그 방식을 원하지 않으면 사용하지 않아도 된다. 각 챕터는 import 와 export 구문을 사용하는 깔끔한 방식을 충분히 제공한다.(?)
+>Angular 는 스스로 모듈방식 접근이나 상세한 문법을 필요로 하지는 않는다. 만약 당신이 그 방식을 원하지 않으면 사용하지 않아도 된다. 각 챕터는 import 와 export 구문을 사용하는 깔끔한 방식을 충분히 제공한다.(?)
 
-모듈 시스템이 아니고 평범하고 오래된 자바스크립트를 사용하는 anagular2 개발을 보여주는 자바스크립트 트랙(이 페이지의 상단에 있는 콤보박스를 선택) 에서 설정 및 구성할 수 있는 방법을 찾을 수 있다.
-```
+>모듈 시스템이 아니고 평범하고 오래된 자바스크립트를 사용하는 anagular2 개발을 보여주는 자바스크립트 트랙(이 페이지의 상단에 있는 콤보박스를 선택) 에서 설정 및 구성할 수 있는 방법을 찾을 수 있다.
 
 
-아마도 우리가 처음 만나게 될 첫 모듈은 compoent class 를 export 하는 모듈이다. Component 는 basic angular blocks 의 하나로서 우리는 그것을 많이 작성하게 될 것이고 다음 부분에서 component 들에 대하여 이야기 하게 될 것이다.  곧 Component class가 우리가 export 한 모듈의 종류의 하나인 것을 충분히 알게 될 것이다.
+ 아마도 우리가 처음 만나게 될 첫 모듈은 compoent class 를 export 하는 모듈이다. Component 는 basic angular blocks 의 하나로서 우리는 그것을 많이 작성하게 될 것이고 다음 부분에서 component 들에 대하여 이야기 하게 될 것이다.  곧 Component class가 우리가 export 한 모듈의 종류의 하나인 것을 충분히 알게 될 것이다.
 
-대부분의 application 은 하나의 AppComponent 를 가지고 있다. 규칙에 의해 우리는 app.component.ts 라는 이름의 파일를 찾을 수 있다. 그 파일의 내용을 보면 우리는 다음과 같은 export 구문을 볼 수 있다.
+ 대부분의 application 은 하나의 AppComponent 를 가지고 있다. 규칙에 의해 우리는 app.component.ts 라는 이름의 파일를 찾을 수 있다. 그 파일의 내용을 보면 우리는 다음과 같은 export 구문을 볼 수 있다.
 ```
 app/app.component.ts(excerpt)
  export class AppComponent()
 ```
-export 구문은 AppComponent 클래스가 public 이고 application 의 다른 모듈에 접근할 수 있는 모듈인 것을 TypeScript 형식으로 말하고 있다.
+ export 구문은 AppComponent 클래스가 public 이고 application 의 다른 모듈에 접근할 수 있는 모듈인 것을 TypeScript 형식으로 말하고 있다.
 
-AppComponent 에 대한 참조가 필요할때 우리는 import 를 다음과 같이 할 수 있다.
+ AppComponent 에 대한 참조가 필요할때 우리는 import 를 다음과 같이 할 수 있다.
 ```
 app/main.ts (excerpt)
  import { AppComponent } from './app.component';
 ```
-import 구문은 이웃하고 있는 파일들 중 이름이 app.component 라는 모듈에서 AppComponent 를 가져오게 할 수 있도록 시스템에 말하고 있다. 모듈 이름( 모듈 id로 불려지는 )은 종종 확장자가 없는 filename 과 동일하다.
+ import 구문은 이웃하고 있는 파일들 중 이름이 app.component 라는 모듈에서 AppComponent 를 가져오게 할 수 있도록 시스템에 말하고 있다. 모듈 이름( 모듈 id로 불려지는 )은 종종 확장자가 없는 filename 과 동일하다.
 
 라이브러리 모듈들
 ---------
@@ -108,3 +107,32 @@ import { AppComponent } from './app.component';
 - 우리는 각 모듈이 한가지만 export 하는 모듈로 이루어진 application으로 작성하는 것을 선호한다.
 
 우리가 작성하는 첫 번째 모듈은 대부분 component 를 export 한다.
+
+컴포넌트
+--
+![enter image description here](https://angular.io/resources/images/devguide/architecture/hero-component.png)
+컴포넌트는 우리가 View 를 호출 할 수 있는 화면 공간에 패치를 컨트롤 한다.(?)  네비게이션 링크를 가진 application root shell, list of heroes, hero editor 들은 모두 Component 에 의해 컨트롤되는 View 들이다.
+
+우리는 클래스 안에 컴포넌트 application logic(view 를 서포트 한다) 을 정의한다. 클래스는 프로퍼티와 메소드 API를 통해서 View 와 상호작용을 한다.
+
+예를 들어서 HeroListComponent 에는 service로 부터 얻은 heroes 배열을 돌려주는 heroes 라는 프로퍼티가 있을 수 있다. 또한 컴포넌트는 유저가 hero 리스트에서 한 hero 를 클릭할 때 selectedHero 라는 프로퍼티를 set 하는 selectHero() 라는 메소드도 가지고 있을지도 모른다. 그것을 class 로 표현하면 다음과 같을 것이다.
+
+```
+app/hero-list.component.ts
+
+export class HeroListComponent implements OnInit {
+	constructor(private _service: HeroService) { }
+
+	heroes: Hero[];
+	selectedHero: Hero;
+
+	ngOnInit(){
+		this.heroes = _service.getHeroes();
+	}
+	selectHero(hero:Hero) { this.selectedHero = hero; }
+}
+```
+application 을 통해 유저가 움직일 때 마다 Angular 는 컴포넌트들을 생성하거나 수정하거나 소멸시킨다.  개발자는 선택적인 Lifecycle Hook 를 통해서 각 순간에 조치를 취할 수 있다.
+
+>우리는 이 예제에서 저기있는 hook 들을 보여주진 않을 것이다. 그러나 저것들을 나중에 알 수 있도록 멘탈 노트를 만들 것이다.
+>우리는 누가 저 생성자를 호출하는거야? 라고 궁금해 할지도 모른다. 누가 service 매개변수를 제공하는가? 잠시동안은 Angular 가 생성자를 호출하고 우리가 원할 때 적당한 HeroService 가져다주는 것만 알고 있으면 된다.
