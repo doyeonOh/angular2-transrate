@@ -45,7 +45,7 @@ Angular 는 브라우저에서 우리의 application content 를 보여주거나
 
 ![enter image description here](https://angular.io/resources/images/devguide/architecture/module.png)
 
->모듈은 option 이다.
+>**모듈은 option 이다.**
 우리는 모듈 방식의 설계를 매우 추천한다. TypeScript 는 ES2015 모듈 문법을 많이 서포트하고 있고 챕터들은 그 문법들을 사용하게 함으로서 우리가 좀 더 모듈 방식에 가까워지도록 하게한다. 그것이 우리가 basic building blocks  사이에 모듈을 넣은 이유이다.
 
 >Angular 는 스스로 모듈방식 접근이나 상세한 문법을 필요로 하지는 않는다. 만약 당신이 그 방식을 원하지 않으면 사용하지 않아도 된다. 각 챕터는 `import` 와 `export` 구문을 사용하는 깔끔한 방식을 충분히 제공한다.(?)
@@ -69,10 +69,7 @@ app/main.ts (excerpt)
 ```
  `import` 구문은 이웃하고 있는 파일들 중 이름이 `app.component` 라는 모듈에서 `AppComponent` 를 가져오게 할 수 있도록 시스템에 말하고 있다. **모듈 이름**( 모듈 id로 불려지는 )은 종종 확장자가 없는 filename 과 동일하다.
 
-라이브러리 모듈들
----------
-
-
+**라이브러리 모듈들**
 
 몇개의 모듈들은 다른 모듈의 라이브러리이다.
 Angular 는 스스로 “barrels”라는 불리는 라이브러리 모듈들의 집합을 실어 나른다. 각각의 Angular 라이브러리는 실제적으로 public 한 외관 위에 몇몇개의 논리적으로 연결된 private 한 모듈들이 있다.
@@ -168,3 +165,49 @@ app/hero-list.component.html
 
 우리가 이미 알고 있는 HTML 엘리먼트들 사이에서 `<hero-detail>` 이 어떻게 편안히 자리잡고 있는지 관심을 가져야 한다. 우리는 같은 레이아웃에 있는 native HTML 과 함께 우리의 커스텀 엘리먼트를 합칠 수 있다.
 그리고 이런 방법으로 우리는 rich featured application를 구축하기 위한 복잡한 Component 트리들을 구성 할 수  있다.
+
+Angular 메타데이터
+--
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/metadata.png) 메타데이터는 Angular가 클래스로 어떻게 처리되는지 알려준다.
+`HeroListComponent` 를 다시 보자. 그냥 그런 class 로 보인다. framework 라는 단서가 없다. 모든 부분에 Angular 가 존재하지 않는다.  
+사실, 그건 진짜 *그냥 class* 이다. 우리가 Angular 에게 말하기 전까지는 component 가 아니다.
+우리는 `HeroListComponent` 가  class 에 **metadata** 가 첨부된 component 라는 것을 Angular 에게 알려준다.
+Typescript 에서 metadata 를 첨부하는 쉬운 방법은 decorator 와 함께 하는 것이다.
+이것은 `HeroListComponent` 의 몇개의 메타데이터이다.
+
+```
+app/hero-list.component.ts (metadata)
+
+@Component({
+	selector: 'hero-list',
+	templateUrl: 'app/hero-list.component.html',
+	directives: [HeroDetailComponent],
+	providers: [HeroService]
+})
+export class HeroListComponent{ ... }
+```
+
+여기에서 우리는 Component class 의 바로 아래에 있는 class 를 식별하는 `@Component` decorator 를 볼 수 있다.  `@Component` decorator 는 Angular 가 Component 와 그것의 View 를 생성하거나 표현하는 것에 대한 필요 정보를 포함하고 있는 필수 설정 Object를 가져야 한다.(?)
+
+ 여기에서 몇개의  `@Component` 설정 옵션을 볼 수 있다.
+
+
+ - `selector` - Angular 가 부모 HTML 안에 있는 `<hero-list>` 태그를 찾은 곳에서 component 의 instance 를 생성하거나 삽입 할 수 있도록 알려주는 css selector 이다. application shell(component) 에 template 이 포함되어 있다면, Angular 는 `HeroListComponent` view 의 instance 를 저 태그들 사이에 삽입한다.  
+```
+<hero-list></hero-list>
+```
+ - `templateUrl` - 위에서 보여준 component template의 주소이다.   
+
+ - `directives` - 이 template 이 필요로 하는 Component 들이나 Directive 들의 배열이다. 우리는 `<hero-detail>` 태그로 표시된 공간에  Angular 가 `HeroDetailComponent` 를 삽입 할 것이라고 예상했던  template 의 마지막 라인을 보았었다. 오직 우리가 `HeroDetailComponent` 를  여기 있는 `directivces` 배열에 언급을 했을 때에만 Angular 는 그렇게 할 것이다.
+ - `providers` - component 가 필요로하는 service에 대한 dependency injection providers(의존주입제공자) 의 배열이다. 이것은 우리의 component 생성자가 `HeroService` 를 필요하다는 것을 Angular 에게 알려주는 한가지 방법이다. 그리고 그것을 사용하여 화면에 그릴 수 있는 영웅들의 리스트를 얻을 수 있다. 우리는 순식간에 dependency injection(의존주입) 을 얻을 수 있다.  
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/template-metadata-component.png)  
+
+`@Component` 함수는 설정 object 를 가지고 있고 이 component class 정의와 연결된 metadata 로 변한다. Angular 는 runtime 때 이 metadata 를 발견하고 따라서 "옳은 일(the right thing)" 하는 방법을 알고 있다.
+
+template, metadata, 그리고 component 는 view 를 함께 그린다.
+
+우리는 Angular 동작을 안내한 것과 비슷한 방식으로 다른 metadata decorator 를 적용할 수 있다. `@Injectable`, `@Input`, `@Output`, `@RouterConfig` 는 우리가 Angular 지식이 성장함에 따라 마스터해야 될  좀 더 자주 쓰이는 decorator 들이다.  
+
+구조적인 take-away 란 우리의 코드에 metadata 를 반드시 추가하는 것이다. 그래야 Angular 가 우리가 무엇을 하는지 알게된다.
