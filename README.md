@@ -211,3 +211,38 @@ template, metadata, 그리고 component 는 view 를 함께 그린다.
 우리는 Angular 동작을 안내한 것과 비슷한 방식으로 다른 metadata decorator 를 적용할 수 있다. `@Injectable`, `@Input`, `@Output`, `@RouterConfig` 는 우리가 Angular 지식이 성장함에 따라 마스터해야 될  좀 더 자주 쓰이는 decorator 들이다.  
 
 구조적인 take-away 란 우리의 코드에 metadata 를 반드시 추가하는 것이다. 그래야 Angular 가 우리가 무엇을 하는지 알게된다.
+
+데이타 바인딩
+--
+프레임워크 없이 우리는 HTML 컨트롤로 데이터 값들을 push 하고 동작과 값 업데이트로 유저 응답을 돌려주는 것을 책임져야한다.  Writing such push/pull logic by hand is tedious, error-prone and a nightmare to read as the experienced jQuery programmer can attest.(해석 불가)
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/databinding.png)
+
+Angular 는 **데이타 바인딩**을 지원한다. template 의 부분들과 component 의 부분들을 조정하는 메카니즘이다.  template HTML 에 바인딩 마크업을 추가함으로써 양측에 어떻게 연결할 수 있는지 Angular 에 알려준다.
+데이터 바인딩 문법의 4가지 형식이 있다. 각 형식은 위 다이어그램 안에 화살표로 가리켜진 것 처럼 방향 (dom에서, dom으로 부터, 또는 양방향 ) 을 가지고 있다.
+
+우리는 우리의 예제 template 에서 3가지의 데이터바인딩을 보았다.
+
+```
+app/hello-list.component.html(excerpt)
+<div>{{hero.name}}</div>
+<hero-detail [hero]="selectedHero"></hero-detail>
+<div (click)="selected(hero)"></div>
+```
+
+- "보간"은 `<div>` 태그안에 있는 component 의 `hero.name`의 속성을 표시한다.
+- `[hero]` 속성 바인딩은 부모인 `HeroListComponent`로 부터 온 `selectedHero` 를 자식인 `HeroDetailComponent` 에 `hero` 속성으로 전달한다.
+- `(click)` 이벤트 바인딩은 영웅의 이름에 유저가 클릭 했을 때 component 의 `selectHero` 메소드를 호출한다.
+
+**양방향 데이터 바인딩**은 `ngModel` directive 를 사용한 단일 표기 안에서 속성과 이벤트 바인딩이 합쳐진 중요한 4번째 형식이다. 우리는 `HeroListComponent` 안에서 양방향 데이터 바인딩을 갖고 있지 않았다. 여기에 `HeroDetailComponent` template 으로부터 온 예제가 있다.(보여주지않았음)
+
+```
+<input [(ngModel)]="hero.name">
+```
+앙뱡향 데이터 바인딩에 있어서, 데이터 속성값은 속성 바인딩이 되어있는 Component 에서 input box 로 흐른다. 이벤트 바인딩처럼 유저에 의한 변경(최신값으로 속성을 재설정)은 또한 component 로 되돌아 흐른다.
+
+Angular는 application component tree 의 루트로부터 깊이우선인 Javascript Event Cycle 한번 당 *모든* 데이터바인딩을 처리한다.(?)
+
+우리는 아직 모든 것에 대한 세부적인 사항은 알 수 없다. 그러나 데이터 바인딩은 template 과 그것의 component 의 통신안에서 중요한 역할을 한다는 것은 예제를 통해 분명해졌다.
+![enter image description here](https://angular.io/resources/images/devguide/architecture/component-databinding.png)
+... **그리고** 부모와 자식 component 사이에서도
