@@ -225,12 +225,13 @@ Angular 는 **데이타 바인딩**을 지원한다. template 의 부분들과 c
 
 ```
 app/hello-list.component.html(excerpt)
+
 <div>{{hero.name}}</div>
 <hero-detail [hero]="selectedHero"></hero-detail>
 <div (click)="selected(hero)"></div>
 ```
 
-- "보간"은 `<div>` 태그안에 있는 component 의 `hero.name`의 속성을 표시한다.
+- "interpolation"( {{ }} 의미하는 듯)은 `<div>` 태그안에 있는 component 의 `hero.name`의 속성을 표시한다.
 - `[hero]` 속성 바인딩은 부모인 `HeroListComponent`로 부터 온 `selectedHero` 를 자식인 `HeroDetailComponent` 에 `hero` 속성으로 전달한다.
 - `(click)` 이벤트 바인딩은 영웅의 이름에 유저가 클릭 했을 때 component 의 `selectHero` 메소드를 호출한다.
 
@@ -244,5 +245,41 @@ app/hello-list.component.html(excerpt)
 Angular는 application component tree 의 루트로부터 깊이우선인 Javascript Event Cycle 한번 당 *모든* 데이터바인딩을 처리한다.(?)
 
 우리는 아직 모든 것에 대한 세부적인 사항은 알 수 없다. 그러나 데이터 바인딩은 template 과 그것의 component 의 통신안에서 중요한 역할을 한다는 것은 예제를 통해 분명해졌다.
+
 ![enter image description here](https://angular.io/resources/images/devguide/architecture/component-databinding.png)
+
 ... **그리고** 부모와 자식 component 사이에서도
+
+
+디렉티브
+--
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/directive.png)
+우리의 template 들은 *동적*이다. Angular 가 그것들을 렌더할 때, 그것은 주어진 directive 의 지시에 따라서 DOM 을 변환한다.
+directive 는 directive metadata 를 가지고 있는 하나의 클래스이다. TypeScript 에서, 우리는 클래스에 metadata 에 첨부할 `@Directive` decorator 를 적용할 것이다.
+우리는 이미 directive 의 한가지 형식(component)을 만났었다. component 는 *template 을 가지고 있는 directive* 라고 하고 실제로 `@Component` decorator 는 template 중심의 기능을 확장한 `@Directive` decorator 이다.
+
+>component 는 기술적으로 directive 이지만, 그것은 매우 고유하면서 우리의 아키텍쳐 개요에 있어 directive 부터 component 를 분리하기 위해 선택하는 Angular application 의 중심이다.
+
+두 개의 *다른* directive 가 있으며, "구조" 와 "속성" directive 라고 불린다.
+그것들은 가끔은 이름 자주로는 할당 또는 바인딩의 대상인 속성과 같은 엘리먼트 태그를 포함하여 나타나는 경향이 있다.
+**구조** directive 는 추가, 삭제 그리고 DOM 에서 엘리먼트 대체에 의해 layout 을 바꾼다.
+우리는 두 개의 내장된 구조 directive 를 사용하는 다음 예제 template 을 통해 볼 수 있다.
+
+```
+<div *ngFor="let hero of heroes"></div>
+<hero-detail *ngIf="selectedHero"></hero-detail>
+```
+- `*ngFor` 는 `heroes` 리스트의 hero 당 하나의 `<div>` 를 찍어내도록(stamp out) Angular 에게 말한다.
+- `*ngIf` 는 오직 선택한 hero 가 존재할 때, `HeroDetail` component 를 포함하도록 한다.
+
+**속성** directive 는 존재하는 엘리먼트의 모양이나 행동을 바꾼다. template 에서 이름 때문에 그것들은 일반 HTML 처럼 보인다,
+양방향 데이터 바인딩을 구현한 `ngModel` directive 은 속성 directive 의 예시이다.
+
+```
+<input [(ndModel)]="hero.name">
+```
+
+그것은 보여지는 값 속성을 세팅하거나 변경 이벤트에 응답함으로써 존재하는 엘리먼트(위에서는 `<input>`) 의 행동을 수정한다.
+Angular 는 layout 구조를 바꾸거나(예를 들어 ngSwitch) DOM 엘리먼트와 component 의 부분을 수정하거나(예를 들어 ngStyle 그리고 ngClass) 하는 몇가지 다른 directive 를 제공한다.
+그리고 당연하게도 우리는 우리만의 directive 들을 작성 할 수 있다.
