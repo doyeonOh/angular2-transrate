@@ -283,3 +283,63 @@ directive 는 directive metadata 를 가지고 있는 하나의 클래스이다.
 그것은 보여지는 값 속성을 세팅하거나 변경 이벤트에 응답함으로써 존재하는 엘리먼트(위에서는 `<input>`) 의 행동을 수정한다.
 Angular 는 layout 구조를 바꾸거나(예를 들어 ngSwitch) DOM 엘리먼트와 component 의 부분을 수정하거나(예를 들어 ngStyle 그리고 ngClass) 하는 몇가지 다른 directive 를 제공한다.
 그리고 당연하게도 우리는 우리만의 directive 들을 작성 할 수 있다.
+
+서비스
+--
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/service.png)
+"서비스"는 값이나 우리 application 에 필요한 기능 혹은 특징을 아우르는 광범위한 범주이다.  
+거의 무엇이든 service 가 될 수 있다. service 는 일반적으로 제한되고 잘 정의된 목적을 가진 클래스이다. service 는 무엇인가를 특정해야하고 또한 그것이 잘 동작하게 해야 한다.
+
+예는 다음과 같다.
+
+- 로깅 서비스
+- 데이터 서비스
+- 메시지 버스
+- 세금 계산
+- application 설정
+
+구체적인 Angular 에 대한 서비스는 없다. Angular 는 스스로 서비스의 정의는 가지고 있지 않다. ServiceBase 클래스는 없다. 그러나 service 는 어떠한 Angular application 에 있어 기본이다.
+여기에 browser console 에 log 를 남기는 service class 의 예제가 있다.
+
+```
+app/logger.service.ts(class only)
+
+export class Logger{
+	log(msg: any)   { console.log(msg); }
+	error(msg: any) { console.error(msg); }
+	warn(msg: any)  { console.warn(msg); }
+}
+```
+
+여기에 heroes 를 가져오고 resolve 된 promise 에서 그들을 반환하는 `HeroService` 가 있다. `HeroService` 는 `LoggerService` 와 서버 커뮤니케이션 그런트 작업(the server communication grunt work)을 조작하는 또 다른 `BackendService` 에 의존한다.
+
+```
+app/hero.service.ts(class only)
+
+export class HeroService{
+	constructor(
+		private backend : BackendService,
+		private logger : Logger
+	) { }
+
+	private heroes: Hero[] = [];
+
+	getHeroes() {
+		this.backend.getAll(Hero).then( (heroes: Hero[]) => {
+			this.logger.log(`Fetched ${heroes.length} heroes.`);
+			this.heroes.push(...heroes); // fill cache
+		});
+		return this.heroes;
+	}
+}
+```
+
+service 는 어디에든지 있다.
+우리의 component 는 service 의 큰 소비자이다. 그들은 대부분의 하기싫은일을 핸들링하는 service 에 의존적이다. 그들은 서버로부터 data 를 가져오지 않고, 유저 입력에 대한 유효성검증도 하지 않고, console 에 직접적으로 log 도 남기지 않는다. 그들은 그와같은 일들을 service 에 위임한다.
+
+component 의 일은 유저 경험(user experience)을 가능하게 하는 것 그 이상 그 이하도 아니다. 그것은 view(template 에 의해 렌더링된) 와 application logic(이것은 종종 몇몇의 "모델" 개념을 포함한다) 사이를 집중한다. 좋은 component 는 데이터바인딩을 위한 속성과 함수들을 제공한다. 그것은 모든 중요한 것들을 service 에 위임한다.
+
+Angular 는 그들의 원칙을 *강요*하지는 않는다. Angular 는  우리가 3000라인의 "흔한(kitchen sink)" 컴포넌트를 작성하더라도 불평하지 않는다.
+
+Angular 는 쉽게 우리 application logic 을 내부의 있는 service 에  반영할 수 있게 만들어주거나  *의존주입*을 통해 component 가 service 를 이용 가능하도록 만들어주게 함으로써 그런 원칙들을 따를 수 있게 도움을 준다.
