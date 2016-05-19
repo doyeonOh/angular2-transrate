@@ -343,3 +343,58 @@ component 의 일은 유저 경험(user experience)을 가능하게 하는 것 �
 Angular 는 그들의 원칙을 *강요*하지는 않는다. Angular 는  우리가 3000라인의 "흔한(kitchen sink)" 컴포넌트를 작성하더라도 불평하지 않는다.
 
 Angular 는 쉽게 우리 application logic 을 내부의 있는 service 에  반영할 수 있게 만들어주거나  *의존주입*을 통해 component 가 service 를 이용 가능하도록 만들어주게 함으로써 그런 원칙들을 따를 수 있게 도움을 준다.
+
+의존주입
+--
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/dependency-injection.png)
+"의존주입" 은 완벽하게 형성된 dependency 들을 가진 class 의 새로운 instance 로 그것을 필요로 하는 곳에 제공하는 한가지 방법이다. 대부분의 dependency 들은 service 들이다. Angular 에서 그들이 원하는 service 와 새로운 component 를 제공하기 위해  dependency injection 을 사용한다.
+
+TypeScript 에서는, Angular 는 constructor 파라메터들의 type 을 보고 component 가 필요로하는 service 들을 말할 수 있다. 예를 들어서 우리의 `HeroListComponent` constructor 는 `HeroService` 를 필요로 한다.
+
+```
+app/hero-list.component.ts (constuctor)
+
+constructor(private service: HeroService) { }
+```
+
+Angular 가 component 를 생성할 때,  component 가 필요로하는 service 가 있는지 **Injector** 에게 첫번째로 물어본다.
+
+`Injector` 는 이전에 생성된 service instance 를 가지고 있는 container 를 유지한다. 만약에 요청된 service instance 가 container 에 없다면,  Injector 는 service instance 를 하나를 만들고 Angular 에 service 를 돌려주기 전에 container 에 추가한다. 모든 요청된 서비스가 해결되고 반환 되었을 때, Angular 는 매개변수로 저 service 들을 가진 component constructor 를 호출할 수 있다. 이것이 *dependency injection* 을 의미 하는 것이다.
+
+`HeroService` injection 의 과정을 보면 다음과 같다.
+
+![enter image description here](https://angular.io/resources/images/devguide/architecture/injector-injects.png)
+
+만약 Injector 가 `HeroService` 를 가지고 있지 않다면, 어떻게 Injector 가 하나를 더 만들 수 있는지 알 수 있을까?
+간단히 말하자면, 우리는 Injector 안에 있는 `HeroService` provider 를 이전에 등록 했어야 한다. provider 는 service 를 생성하거나 반환하는 어떠한 것이다. 일반적으로 service class 그 자체를 말한다.
+
+우리는 application component tree 의 어느 level 에서도 provider 를 등록할 수 있다. 우리는 application 을 bootstrap 할 때 root 에서 종종 그런 일을 한다. 그렇기 때문에 같은 service instance 를 어디에서든지 이용가능 하다.
+
+```
+app/main.ts (excerpt)
+
+bootstrap(AppComponent, [BackendService, HeroService, Logger]);
+```  
+
+그렇게 하지 않으면, 우리는 component level 에서도 등록할 수도 있다.
+
+```
+app/hero-list.component.ts (excerpt)
+
+@Component({
+	providers : [HeroService]
+})
+export class HeroListComponent { ... }
+```
+이 경우에, 각각의 새로운 component instance 마다 새로운 service instance 를 얻을 수 있다.
+
+우리는 이번 개요에 대한 dependency injection 을 훨씬 많이 단순화 시켰다.  우리는 [dependency injection](https://angular.io/docs/ts/latest/guide/dependency-injection.html) 챕터에서 전체 이야기를 배울 수 있다.
+
+기억해야 될 포인트는
+
+- dependency injection 은  framework 안에서 연결되어 있고, 어디에서든지 사용할 수 있다.
+- `Injector` 는 중요한 메커니즘이다.
+	- Injector 는 생성되어진 service instance 를 가진 container 를 유지한다.
+	- Injector 는 *provider* 를 사용해서 새로운 service instance 를 생성할 수 있다.
+	- *provider* 는 service 를 생성하기 위한 레시피이다.
