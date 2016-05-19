@@ -397,4 +397,5 @@ export class HeroListComponent { ... }
 - `Injector` 는 중요한 메커니즘이다.
 	- Injector 는 생성되어진 service instance 를 가진 container 를 유지한다.
 	- Injector 는 *provider* 를 사용해서 새로운 service instance 를 생성할 수 있다.
-	- *provider* 는 service 를 생성하기 위한 레시피이다.
+- *provider* 는 service 를 생성하기 위한 레시피이다.
+- 우리는 Injector 를 이용하여 provider 를 등록한다.
