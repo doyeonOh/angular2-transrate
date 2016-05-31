@@ -18,8 +18,8 @@ Displaying Data
 차례
 
 - 보간법( interpolation ) 과 함께 component 속성을 보여주기
-- NgFor 를 사용한 array 속성 보여주기
-- NgIf 를 사용한 선택적 표현하기
+- *ngFor 를 사용한 array 속성 보여주기
+- *ngIf 를 사용한 선택적 표현하기
 
 > [live example](https://angular.io/resources/live-examples/displaying-data/ts/plnkr.html) 는 이번 챕터의 모든 문법과 코드 예제를 모두 보여준다.
 
@@ -91,3 +91,82 @@ npm start
 ![enter image description here](https://angular.io/resources/images/devguide/displaying-data/title-and-hero.png)
 
 우리가 대안을 만들고 고려한 몇개의 선택지를 review 해보자.
+
+###템플릿 인라인 또는 템플릿 파일?
+
+우리는 두군데 장소 중 하나에 component template 을 저장할 수 있다. `template` 속성을 사용해서 그것을 *inline* 으로 정의할 수 있다.  또는 우리는 별도의 HTML 안에서 template 을 정의 할 수 있고, `@Component` decorator 의 `templateUrl` 속성을 이용하여 component metadata 에서 그것들을 연결 할 수 있다.
+
+inline 형식과 별도의 HTML 사이에서의 선택은 취향, 상황, 조직 정책의 문제이다. 여기서 우리는 inline 형식을 사용한다. 왜냐하면 template 이 작고 demo 가 HTML file 이 없어도 간단하기 때문이다.
+
+어떤 스타일이든, template data binding 이 component 속성에 동일한 접근을 한다.
+
+### 생성자 또는 변수 초기화?
+
+우리는 변수 할당을 사용해서 component 속성들을 초기화했다. 이것은 매우 간결하고 완벽한 테크닉이다.
+
+몇몇의 사람들은 다음과 같이 생성자 안에서 속성을 선언하거나 초기화하는 것을 선호한다.
+
+```
+export class AppCtorComponent {
+	title: string;
+	myHero: string;
+
+	constructor(){
+		this.title = 'Tour of Heroes';
+		this.myHero = 'Windstorm';
+	}
+}
+```
+그것도 역시 괜찮은 방법이다. 선택은 취향이나 조직 정책의 문제이다. 우리는 간단하게 이번 챕터에서 더욱 간결한 "변수 할당" 스타일을 채택할 것이다. 왜냐하면 그것이 읽는데 적은 코드가 들기 때문이다.
+
+### *ngFor 를 사용한 array 속성 보여주기
+
+우리는 hero 들의 list 를 보여주길 원한다. 우리는 component 에 모조의 hero 들의 이름을 가진 array 를 `myHero` 위에 추가하는 것으로 시작한다.  그리고 array 의 첫번째 이름을 `myHero` 에 다시 정의 한다.
+
+```
+app/app.component.ts (class)
+
+export class AppComponent {
+	title = 'Tour of Heroes';
+	heroes = ['Windstorm', 'Bombasto', 'Magneta', 'Tornado'];
+	myHero = this.heroes[0];
+}
+```
+
+이제 우리는 `heroes` 리스트 안에 각각의 item 들을 template 에 표현하기 위해 Angular 의 `ngFor` "반복자" directive 를 사용한다.
+
+```
+app/app.component.ts (template)
+
+template: `
+	<h1>{{title}}</h1>
+		<h2>My favorite hero is: {{myHero}}</h2>
+		<p>Heroes:</p>
+		<ul>
+			<li *ngFor="let hero of heroes">
+				{{ hero }}
+			</li>
+		</ul>
+`
+```
+우리의 표현은  친숙한 HTML 인`<ul>` 과 `<li>` 태그를 사용한 정렬되지 않은 리스트이다. 자 이제 `<li>` 태그에 집중해보자.
+
+```
+<li *ngFor="let hero of heroes">
+	{{ hero }}
+</li>
+```
+
+우리는 뭔가 미스테리한 `*ngFor` 와 `<li>` 태그를 추가했다. 그것은 Angular 의 "반복자" directive 이다. `<li>` 태그에 마크된 그것은 존재는 `<li>` 요소 ( 그리고 그것의 자식들도) 가 "반복자 template" 이라는 것을 말한다.
+
+> `*ngFor` 의 앞에 있는 별표(*) 를 잊으면 안된다. 그것은 문법에서 필요한 부분이다. 이것과 관련한 것과 `ngFor`에 대해서 더 알고 싶다면 [Template Syntax](https://angular.io/docs/ts/latest/guide/template-syntax.html#ngFor) 챕터를 참조해라.
+
+`ngFor` 쌍따옴표 지시자 안에 `hero` 를 보자. 이것은 [template input variable](https://angular.io/docs/ts/latest/guide/template-syntax.html#ngForMicrosyntax) 의 하나의 예이다.
+
+Angular 는 list 안에 각각의 item 을 위해서 `<li>` 를 반복하고, 현재의 iteration 안에 있는 item 에 hero 변수들을 세팅한다. Angular 는 이중 중괄호 보간법을 위한 컨텍스트로 그 변수들을 사용한다.
+
+>우리는 배열을 표시하려면 `ngFor`를 주어야 한다. 사실, `ngFor` 는 어떠한 [iterable](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) 객체의 item 도 반복할 수 있다.
+
+여전히 `npm start` 명령어 아래 동작되고 있다면, 우리는 정렬되지 않은 리스트 안에 heroes 가 표시된 것을 볼 수 있다.
+
+![enter image description here](https://angular.io/resources/images/devguide/displaying-data/hero-names-list.png)
