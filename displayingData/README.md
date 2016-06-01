@@ -170,3 +170,78 @@ Angular 는 list 안에 각각의 item 을 위해서 `<li>` 를 반복하고, �
 여전히 `npm start` 명령어 아래 동작되고 있다면, 우리는 정렬되지 않은 리스트 안에 heroes 가 표시된 것을 볼 수 있다.
 
 ![enter image description here](https://angular.io/resources/images/devguide/displaying-data/hero-names-list.png)
+
+
+### 데이터를 위한 클래스 생성하기
+
+우리는 component 에 직접적으로 데이터를 정의했다. 그것은 데모에서는 괜찮은 방법이지만 확실히 최선의 방법은 아니다. 그리고 좋은 방법도 아니다. 비록 우리는 이번 챕터에서 그것에 대해 아무것도 하지 않지만, 우리는 그런 부분들을 해결할 수 있는 멘탈노트를 만들 것이다.
+
+지금, 우리는 string array 에 바인딩 하고 있다. 우리는 때때로 실제 application 에서 그것을 행한다. 그러나 대부분 시간에서 우리는 객체(잠재적으로는 클래스의 instance)를 표현한다.
+
+이제 `Hero` 객체 배열이 우리의 hero 이름 배열로 되게 해보자. 일단 우리는 `Hero` class 가 필요하다.
+
+`app/` 폴더 안에  다음과 같은 약간의 코드를 가진 `hero.ts` 라고 불리는 새로운 파일을 만든다.
+
+```
+app/hero.ts
+
+export class Hero {
+	constructor(
+		public id: number,
+		public name: string
+	) { }
+}
+```
+
+우리는 생성자와 2개의 속성(id, name)을 가진 클래스를 정의했다.
+
+그것은 우리가 속성을 가진것 처럼 보이지 않을 수도 있다. 그러나 우리는 가지고 있는 것이다. 우리는 생성자 파라메터의 선언안에서 TypeScript 의 바로가기(shortcut)를 활용할 수 있다.
+
+첫번째 파라메터에 대해서 생각해보자.
+
+```
+public id: number,
+```
+
+이 간단한 문법은 많은 작업을 수행한다.
+
+- 생성자 파라메터와 그것의 타입을 선언한다.
+- 같은 이름의 public 한 속성을 선언한다.
+- 우리가 클래스 인스턴스를 새로 만들 때, 해당 파라메터의 속성을 초기화 한다.
+
+### Hero 클래스 사용하기
+
+우리 component 안에 hero 객체의 배열을 돌리기 위한  `heroes` 속성을 다시 정의하고, 또한 mock Heroes의 첫번째를 `myHero` 속성에 세팅하자.
+
+```
+app.component.ts (excerpt)
+
+heroes = [
+	new Hero(1, 'Windstorm'),
+	new Hero(13, 'Bombasto'),
+	new Hero(15, 'Magneta'),
+	new Hero(20, 'Tornado')
+];
+
+myHero = this.heroes[0];
+```
+
+우리는 template 을 업데이트 해야한다. 순간 그것은 완전한 `hero` 객체를 표현한다. (그것은 string value 로 사용된다). `hero.name` 속성	을 삽입하면서 그것을 수정해보자.
+
+```
+app.component.ts (template)
+
+template: `
+	<h1>{{title}}}</h1>
+	<h2>My favorite hero is: {{myHero.name}} </h2>
+	<p>Heroes: </p>
+	<ul>
+		<li *ngFor="let hero of heroes">
+			{{ hero.name }}
+		</li>
+	</ul>
+
+`
+```
+
+display 는 보기에 전과 똑같다. 그러나 지금 우리는 hero 가 진짜 무엇인지 좀 더 알게 되었다.
