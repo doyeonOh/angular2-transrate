@@ -245,3 +245,31 @@ template: `
 ```
 
 display 는 보기에 전과 똑같다. 그러나 지금 우리는 hero 가 진짜 무엇인지 좀 더 알게 되었다.
+
+### NgIf 를 사용한 선택적 표현하기
+
+가끔식 app 은 특정 상황 아래에서 view 나 view 의 일부를 보여줘야만 한다.
+
+우리의 예제에서는, 많은 hero 를 가지고 있는 경우(3개 이상) 메시지를 표현해야 한다.
+
+Angular 의 `ngIf` directive 는 성공/실패 조건 하에 요소를 삽입하거나 제거한다. 우리는 밑에 있는 template 에 있는 문장들을 추가함으로써 실제 액션에서 그것들을 볼 수 있다.
+
+```
+<p *ngIf="heroes.length > 3"> There are many heroes!</p>
+```
+>`*ngIf` 앞에 있는 별표시(*) 잊으면 안된다. 그것은 문법에 중요한 부분이다. 이것과 `ngIf`에 더 배우고 싶다면 [Template Syntax](https://angular.io/docs/ts/latest/guide/template-syntax.html#ngIf) 챕터를 확인하라.
+
+쌍따옴표 안에 있는 [template expression](https://angular.io/docs/ts/latest/guide/template-syntax.html#template-expressions) 은 Javascript 같이 보이거나 거의 Javascript 와 똑같다. component 의 hero 리스트가 3개의 item 보다 많이 가지고 있을 때, Angular 는 DOM 에 문장을 추가하고,  메시지를 표현한다. 만약 3개나 그 이하의 item 을 가지고 있다면, Angular 는 문장을 생략한다. 그래서 아무런 메시지도 표현하지 않는다.
+
+>Angular 는 메시지를 보여주거나 숨기지 않는다. 그냥 DOM 으로부터 문장 element 를 추가하거나 삭제한다. 그것은 여기서 중요하지 않은 문제다. 그러나 만약 우리가 많은 데이터 바인딩을 가진 매우 큰 HTML을 선택적으로 포함시키거나 제외 시킨다면, 퍼포먼스 관점에서 상당한 문제가 된다.
+
+그것을 시도해보라. 배열은 4개의 item 을 가지고 있기 때문에, 메시지는 나타난다. `app.component.ts` 파일로 다시 돌아가서 hero 배열에서 하나의 element 를 삭제하거나 주석처리 하자. browser 는 자동으로 refresh 가 되고, 메시지는 사라진다.
+
+###요약
+
+이제 어떻게 사용해야 하는지 알게됐다.
+
+- 이중 중괄호를 가진 보간법은 component 속성을 표현한다.
+- `ngFor` 는 item list 를 표현한다.
+- TypeScript 클래스는 component 를 위해서 model data 를 형성하고 그 model 속성을 표현한다.
+- `ngIf` 는 boolean expression 위에서 HTML 덩어리를 선택적으로 표현한다.
