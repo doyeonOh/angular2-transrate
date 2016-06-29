@@ -28,3 +28,107 @@ Angular animation system 은 우리가 원하는 여러 animation 을 만들기 
 - 평행한 애니메이션 그룹
 
 >이 챕터의 예제 참조는 [live example](https://angular.io/resources/live-examples/animations/ts/plnkr.html) 에서 이용가능 합니다.
+
+퀵스타트 예제:  두 가지 상태에서의 트랜지셔닝
+-
+
+모델 속성에 의해 두가지 상태를 트랜지셔닝하는 심플한 애니메이션을 빌드해보자.
+
+Animation 들은 내부에 `@Component` 메타데이터를 정의한다. 우리가 몇몇을 추가하기 전에, 우리는 약간의 animation specific function 을 가져와야 한다.
+
+```
+import {
+	Component,
+	Input,
+	trigger,
+	state,
+	style,
+	transition,
+	animate
+} from '@angular/core';
+```
+
+우리는 이제 component metadata 에서 `heroState` 라고 불리는 *animation trigger* 를 정의할 수 있다.  그것은 두 가지 상태(active 와 inactive)에서 트랜지셔닝하는 것을 animate 한다. hero 가 active 할 때, 우리는 약간 큰 사이즈와 밝은 색상으로 element 를 표현한다.
+
+```
+animations: [
+	trigger('heroState', [
+		state('inactive', style({
+			background-color: '#eee',
+			transform: 'scale(1)'
+		})),
+		state('active', style({
+			background-color: '#cfd8dc',
+			transform: 'scale(1.1)'
+		})),
+		transition('inactive => active', animate('100ms  ease-in')),
+		transition('active => inactive', animate('100ms ease-out'))
+	])
+]
+```
+
+>이 예제에서는 우리가 animation metadata 에 직접 inline 으로 animation style (color and transform) 을 정의했다. 곧 다가올 Angular 릴리즈는 Component CSS Stylesheet 로부터 가져오는 것을 추가 할 수 있도록 지원 할 것이다.
+
+자 이제 우리는 정의된 Animation 을 가지고 있다. 하지만 그것은 아직 어느 곳에서도 사용하지 못한다. 우리는 `@triggerName` 문법을 사용하여 component 의 template 에 하나 이상의 element 에 부착하여 이를 변경 할 수 있다.
+
+```
+template: `
+	<ul>
+		<li *ngFor="let hero of heroes"
+			@heroState="hero.state"
+			(click)="hero.toggleHero()">
+			{{ hero.name }}
+		</li>
+	</ul>
+
+`
+```
+여기에 우리는 `ngFor`에 의해 모든 element 들이 반복되어지는 animation trigger 를 적용했다. 각각의 반복되어지는 element 들은 개별적으로 animate 될 것이다. 우리는 `hero.state` expression 을 통해서 속성값을 바인딩 한다. 우리는 그것들이 항상 `inactive` 또는 `active` 에 있다는 것을 예상할 수 있다. 우리가 animation 상태를 정의했을때 부터 말이다.
+
+이 설정으로,  hero object state 가 변경될 때마다 animate 하는 트랜지션이 보여진다. 이것은 전체 컴포넌트 구현체이다.
+
+```
+import {
+  Component,
+  Input,
+  trigger,
+  state,
+  style,
+  transition,
+  animate
+} from '@angular/core';
+import { Heroes } from './hero.service';
+
+@Component({
+  moduleId: module.id,
+  selector: 'hero-list-basic',
+  template: `
+    <ul>
+      <li *ngFor="let hero of heroes"
+          @heroState="hero.state"
+          (click)="hero.toggleState()">
+        {{hero.name}}
+      </li>
+    </ul>
+  `,
+  styleUrls: ['hero-list.component.css'],
+  animations: [
+    trigger('heroState', [
+      state('inactive', style({
+        backgroundColor: '#eee',
+        transform: 'scale(1)'
+      })),
+      state('active',   style({
+        backgroundColor: '#cfd8dc',
+        transform: 'scale(1.1)'
+      })),
+      transition('inactive => active', animate('100ms ease-in')),
+      transition('active => inactive', animate('100ms ease-out'))
+    ])
+  ]
+})
+export class HeroListBasicComponent {
+  @Input() heroes: Heroes;
+}
+
+```
