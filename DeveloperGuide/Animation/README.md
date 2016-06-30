@@ -18,7 +18,7 @@ Angular animation system 은 우리가 원하는 여러 animation 을 만들기 
 목차
 
 - 퀵스타트 예제:  두 개의 상태에서의  트랜지셔닝
-- 상태들과 트랜지션들
+- 상태와 트랜지션
 - 예제 : 진입과 이탈
 - 예제 : 다른 상태로부터의 진입과 이탈
 - 애니메이션 속성과 단위
@@ -31,6 +31,7 @@ Angular animation system 은 우리가 원하는 여러 animation 을 만들기 
 
 퀵스타트 예제:  두 가지 상태에서의 트랜지셔닝
 -
+![enter image description here](https://angular.io/resources/images/devguide/animations/animation_basic_click.gif)
 
 모델 속성에 의해 두가지 상태를 트랜지셔닝하는 심플한 애니메이션을 빌드해보자.
 
@@ -132,3 +133,78 @@ export class HeroListBasicComponent {
 }
 
 ```
+
+상태와 트랜지션
+-
+
+Angular Animation 들은 논리적 상태나 상태 사이에 있는 트랜지션 관점에서 정의된다.
+
+Animation 상태는 우리가 application code 로 정의할 수 있는 string value 이다. 위의 예제에서, 우리는 hero object 의 논리적 상태를 기반으로 `'active'` 와 `'inactive'` 라는 상태를 사용했다. 상태의 소스는 이번 경우에 간단한 객체 속성일 수도 있고 메소드에서 계산된 값일수도 있다.  중요한 점은 우리가 component 의 template 을 통해서 그것을 읽을 수 있다는 것이다.
+
+우리는 각 animation 상태에 *styles* 정의할 수 있다.
+
+```
+state('inactive', style({
+  backgroundColor: '#eee',
+  transform: 'scale(1)'
+})),
+state('active',   style({
+  backgroundColor: '#cfd8dc',
+  transform: 'scale(1.1)'
+})),
+```
+저기있는 `state` 정의들은 각 상태의 *end styles*  지정하고 있다.  그것들은 그 상태로 트랜지션 되었을 때 element 를 한번 적용한다. 그리고 그 상태로 남아있는 한 유지된다. 그런 의미에서 상태가 많아지면 우리는 이곳에 있는 것보다 animation 을 더 많이 정의해야 한다. 우리는 실제로 서로 다른 상태에 있는 element 의 style 을 정의하는 것이다.
+
+우리가 상태들을 가지고 있을 때, 그 상태 사이의 *트랜지션*을 정의할 수 있다. 각 트랜지션은 하나의 스타일 셋과 다음 사이에서 스위칭 타이밍을 컨트롤 할 수 있다.
+
+```
+transition('inactive => active', animate('100ms ease-in')),
+transition('active => inactive', animate('100ms ease-out'))
+```
+![enter image description here](https://angular.io/resources/images/devguide/animations/ng_animate_transitions_inactive_active.png)
+
+만약 우리가 몇몇개의 트랜지션에 대해 같은 타이밍의 설정을 가지고 있으면, 우리는 같은 `transition` 정의을 통해 그것들을 합칠 수 있다.
+
+```
+transition('inactive => active, active => inactive',
+ animate('100ms ease-out'))
+```
+
+우리가 트랜지션의 양방향이 같은 타이밍을 가지고 있을 때는, 이전 예제에서 했던 것과 같이, 우리는 `<==>` 속기 문법을 사용할 수 있다.
+
+```
+transition('inactive <=> active', animate('100ms ease-out'))
+```
+
+가끔씩 우리는 animation 시에서는 적용하지만 끝난 후 더이상 유지하지 않길 원하는 스타일들을 가지고 있다. 우리는 `transition` 안에서 그런 스타일을 inline 으로 정의할 수 있다. 이번 예제에서, element 는 즉시 하나의 스타일 셋을 받고 다음으로 애니메이션 된다. 트랜지션이 종료된 후에는, 스타일들이 아무것도 유지되지 않을 것이다. 왜냐하면 그것들이 `state` 에 정의되지 않았기 때문이다.
+
+```
+transition('inactive => active', [
+  style({
+    backgroundColor: '#cfd8dc',
+    transform: 'scale(1.3)'
+  }),
+  animate('80ms ease-in', style({
+    backgroundColor: '#eee',
+    transform: 'scale(1)'
+  }))
+])
+```
+
+####와일드카드 상태 `*`
+
+`*`( 와일드카드 ) 상태는 어떠한 animation 상태에도 매칭된다. 이것은 animation 안에 있는 어떤한 상태에도 관계없이 상태와 트랜지션을 정의함에 있어서 매우 유용하다. 예를 들어
+
+- `active => *` 트랜지션은 element 상태가 `active` 에서 다른 어떤한 것으로 변경될 때 적용된다.
+- `* => *` 트랜지션은 두개의 상태에서 어떠한 변경이라도 발생되면 적용된다.
+
+![enter image description here](https://angular.io/resources/images/devguide/animations/ng_animate_transitions_inactive_active_wildcards.png)
+
+#### `void` 상태
+
+특별한 상태의 하나인 `void` 는 어떠한 animation 에도 적용할 수 있다. 그건 view 에 붙이지 않는 element 일 때 적용한다. 이것은 그것이 아직 추가하지 않거나, 혹은 삭제되었기 때문일지도 모른다. `void` 상태는 '진입' 과 '이탈' animation 을 정의할 때 유용하게 쓰인다.
+
+예를 들어서 `* => void` 트랜지션은 이탈하기 전 상태와 관계 없이 view 를 이탈할 때 적용된다.
+![enter image description here](https://angular.io/resources/images/devguide/animations/ng_animate_transitions_void_in.png)
+
+와일드카드 상태인 `*` 은 또한 `void` 에 매칭된다.
