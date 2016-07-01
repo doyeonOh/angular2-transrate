@@ -208,3 +208,69 @@ transition('inactive => active', [
 ![enter image description here](https://angular.io/resources/images/devguide/animations/ng_animate_transitions_void_in.png)
 
 와일드카드 상태인 `*` 은 또한 `void` 에 매칭된다.
+
+예제: 진입과 이탈
+-
+![enter image description here](https://angular.io/resources/images/devguide/animations/animation_enter_leave.gif)
+`void` 와 `*` 상태를 사용하면, 우리는 element 에 진입, 이탈을 애니메이션하는 트랜지션을 정의할 수 있다.
+
+- Enter: `void => *`
+- Leave: `* => void`
+
+```
+animations: [
+	trigger('flyInOut', [
+		state('in', style({ transform: 'translateX(0)'})),
+		transition('void => *', [
+			style({ transform: 'translateX(-100%)' }),
+			animate(100)
+		]),
+		transition('* => void', [
+			animate(100, style({transform: 'translateX(100%)'}))
+		])
+	])
+]
+```
+ 이경우에 우리는 별도의 `state(void)` 정의가 아닌 트랜지션 정의에서 직접 void 상태에 적용된 스타일들을 가지고 있다. 우리가 이렇게 한 이유는 진입과 이탈시 transform 이 다르길 원하기 때문이다 : element 는 왼쪽에서 진입하고 오른쪽에서 이탈한다.
+
+예제 : 다른 상태에서의 진입과 이탈
+-
+
+![enter image description here](https://angular.io/resources/images/devguide/animations/animation_enter_leave_states.gif)
+
+우리는 또 Animation 상태인 hero 상태를 사용하여 이전 상태 트랜지션 Animation과 이 Animation 을 합칠 수 있다. 우리가 그것을 합친다면  영웅의 상태에 따라 진입과 이탈이 다른 트랜지션을 설정할 수 있다.
+
+- Inactive hero 진입: `void => inactive`
+- Active hero 진입: `void => active`
+- Inactive hero 이탈 : `inactive => void`
+- Active hero 이탈 : `active => void`
+
+이제 우리는 각 트랜지션에 있어 세밀한 컨트롤을 가진다.
+
+![enter image description here](https://angular.io/resources/images/devguide/animations/ng_animate_transitions_inactive_active_void.png)
+
+```
+animations: [
+  trigger('heroState', [
+    state('inactive', style({transform: 'translateX(0) scale(1)'})),
+    state('active',   style({transform: 'translateX(0) scale(1.1)'})),
+    transition('inactive => active', animate('100ms ease-in')),
+    transition('active => inactive', animate('100ms ease-out')),
+    transition('void => inactive', [
+      style({transform: 'translateX(-100%) scale(1)'}),
+      animate(100)
+    ]),
+    transition('inactive => void', [
+      animate(100, style({transform: 'translateX(100%) scale(1)'}))
+    ]),
+    transition('void => active', [
+      style({transform: 'translateX(0) scale(0)'}),
+      animate(200)
+    ]),
+    transition('active => void', [
+      animate(200, style({transform: 'translateX(0) scale(0)'}))
+    ])
+  ])
+]
+
+```
