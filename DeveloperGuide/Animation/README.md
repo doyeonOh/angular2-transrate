@@ -274,3 +274,41 @@ animations: [
 ]
 
 ```
+
+애니메이션 속성과 단위
+-
+
+Angular 애니메이션 지원이 Web Animations 의 최상단에 빌드되었을때부터, 우리는 브라우저가 생각하는 *animatable* 한 모든 속성을 애니메이션 할 수 있다. 이것은 positions, sizes, transforms, colors, borders 그리고 많은 다른 것들을 포함한다. W3C 은 [애니메이션 속성 리스트](https://www.w3.org/TR/css3-transitions/#animatable-properties)를 유지한다.
+
+수치를 갖고 있는 위치 속성을 위해서, 우리는 적당한 suffix 를 가진 string 형식의 값을 제공하여 단위를 정의할 수 있다.
+
+- '50px'
+- '3em'
+- '100%'
+
+대부분의 치수 속성을 위해서 우리는 또한 픽셀로 가정된 숫자를 정의할 수 있다.
+
+- `50` 은 `50px` 와 같다.
+
+
+자동 속성 계산
+-
+
+![enter image description here](https://angular.io/resources/images/devguide/animations/animation_auto.gif)
+가끔씩 우리가 애니메이션하길 원하는 치수 스타일 속성 값은 런타임까지 알 수 없다. 예를 들어, 그들의 컨텐트나 스크린 사이즈에 따라 넓이와 높이를 가진 element 는 꽤 일반적이다. 그 속성들은 종종 CSS 를 이용한 애니메이션이 힘들 수 있다.
+
+Angular 안에서 이러한 경우에는,  우리는 특별한 `*` 속성값을 사용할 수 있다. 그것이 뜻하는 것은 이 속성값은 런타임 중에 계산되고, 그 이후에 애니메이션에 연결된다는 것이다.
+
+The "leave" animation in this example takes whatever height the element has before it leaves and animates from that height to zero:( 불가.. )
+
+```
+animations: [
+  trigger('shrinkOut', [
+    state('in', style({height: '*'})),
+    transition('* => void', [
+      style({height: '*'}),
+      animate(250, style({height: 0}))
+    ])
+  ])
+]
+```
